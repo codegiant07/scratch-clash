@@ -1,6 +1,7 @@
 import React from "react";
 
-export default function CatSprite() {
+// `hue` tints the cat (0 = original orange) so sprites look different.
+export default function CatSprite({ style, hue = 0 }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -9,6 +10,7 @@ export default function CatSprite() {
       viewBox="0.3210171699523926 0.3000000357627869 95.17898101806641 100.04156036376953"
       version="1.1"
       xmlSpace="preserve"
+      style={hue ? { ...style, filter: `hue-rotate(${hue}deg)` } : style}
     >
       <g>
         <g id="Page-1" stroke="none" fillRule="evenodd">
