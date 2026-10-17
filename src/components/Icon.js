@@ -7,7 +7,9 @@ export default function Icon({ name, size = 20, className = "" }) {
       width={size.toString() + "px"}
       height={size.toString() + "px"}
     >
-      <use xlinkHref={`/icons/solid.svg#${name}`} />
+      {/* Relative path so icons also load when the app is served from a
+          sub-folder, e.g. GitHub Pages at /scratch-clash/ */}
+      <use xlinkHref={`icons/solid.svg#${name}`} />
     </svg>
   );
 }
