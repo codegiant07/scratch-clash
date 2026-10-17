@@ -99,7 +99,9 @@ export async function runBlock(
       break;
     case "goTo":
       update(clampToStage(toNumber(inputs.x), toNumber(inputs.y)));
-      checkCollisions(spriteId, { getState, dispatch });
+      // A jump is not a bump: only note any overlap, so landing next to a
+      // sprite (e.g. one still at its old spot when Play starts) never swaps
+      findNewCollisions(spriteId, getState().sprites);
       break;
     case "sayFor":
     case "thinkFor": {

@@ -4,7 +4,7 @@ A Scratch-style visual coding playground built with **React** and **Tailwind CSS
 Drag blocks into scripts, give each sprite its own script, press the green flag, and watch
 the **Hero Feature**: when two sprites collide, they swap animations.
 
-Juspay ReactJS challenge — *"Build a visual coding environment"*.
+ReactJS challenge — *"Build a visual coding environment"*.
 
 ## Run locally
 
