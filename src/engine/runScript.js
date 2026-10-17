@@ -32,6 +32,7 @@ let generation = 0;
 // A run's spriteId can change mid-run when a collision hands it to another sprite.
 const runningScripts = {};
 let nextBubbleId = 1;
+let nextEffectId = 1;
 
 const runningOf = (spriteId) =>
   runningScripts[spriteId] || (runningScripts[spriteId] = new Set());
@@ -126,7 +127,7 @@ export async function runBlock(
   }
 }
 
-// Each block runs on whichever sprite the run drives *now* (see swapScripts).
+// Each block runs on whichever sprite the run drives *now* (see swapAnimations).
 async function runBlocks(blocks, run, engine) {
   for (const block of blocks) {
     if (run.isStopped()) return;
@@ -158,17 +159,24 @@ export function runStack(blocks, spriteId, engine, stackId = null) {
   );
 }
 
-// Hero Feature: when two sprites bump, they swap scripts, and each one takes
-// over the other's running animation exactly where it was. Nothing restarts,
-// so set-up blocks like "go to" at the top of a script never run again.
-function swapScripts(idA, idB, engine) {
+// Hero Feature: when two sprites bump, they swap their *running animations*:
+// each one carries on the other's animation exactly where it was. Each
+// sprite's own script in the editor is left unchanged, so the next Play
+// starts fresh (its own "go to", its own "say"). Nothing restarts mid-run.
+function swapAnimations(idA, idB, engine) {
   const { getState, dispatch } = engine;
   const find = (spriteId) =>
     getState().sprites.find(({ id }) => id === spriteId);
-  const stacksA = find(idA).stacks;
-  const stacksB = find(idB).stacks;
-  dispatch({ type: "UPDATE_SPRITE", id: idA, changes: { stacks: stacksB } });
-  dispatch({ type: "UPDATE_SPRITE", id: idB, changes: { stacks: stacksA } });
+  const a = find(idA);
+  const b = find(idB);
+  // Bump counters replay the wobble on the stage
+  dispatch({ type: "UPDATE_SPRITE", id: idA, changes: { bumps: a.bumps + 1 } });
+  dispatch({ type: "UPDATE_SPRITE", id: idB, changes: { bumps: b.bumps + 1 } });
+  // Show a "BUMP!" burst halfway between the two sprites
+  dispatch({
+    type: "ADD_EFFECT",
+    effect: { id: nextEffectId++, x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
+  });
 
   const runsA = [...runningOf(idA)];
   const runsB = [...runningOf(idB)];
@@ -179,11 +187,11 @@ function swapScripts(idA, idB, engine) {
 }
 
 // Swap only while at least one of the two is animating, so placing
-// sprites by hand never shuffles their scripts.
+// sprites by hand never swaps anything.
 function checkCollisions(spriteId, engine) {
   findNewCollisions(spriteId, engine.getState().sprites).forEach((other) => {
     if (runningStackIds(spriteId).length || runningStackIds(other.id).length) {
-      swapScripts(spriteId, other.id, engine);
+      swapAnimations(spriteId, other.id, engine);
     }
   });
 }

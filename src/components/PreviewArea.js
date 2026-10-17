@@ -1,5 +1,6 @@
 import React from "react";
 import CatSprite from "./CatSprite";
+import BumpEffect from "./BumpEffect";
 import Icon from "./Icon";
 import SpeechBubble from "./SpeechBubble";
 import SpriteList from "./SpriteList";
@@ -62,11 +63,24 @@ export default function PreviewArea() {
               }deg)${sprite.mirrored ? " scaleX(-1)" : ""}`,
             }}
           >
-            <CatSprite
-              hue={sprite.hue}
-              style={{ display: "block", width: "100%", height: "auto" }}
-            />
+            {/* A new key on every bump remounts this, replaying the wobble */}
+            <div
+              key={sprite.bumps}
+              className={sprite.bumps ? "animate-wobble" : ""}
+            >
+              <CatSprite
+                hue={sprite.hue}
+                style={{ display: "block", width: "100%", height: "auto" }}
+              />
+            </div>
           </div>
+        ))}
+        {state.effects.map((effect) => (
+          <BumpEffect
+            key={effect.id}
+            effect={effect}
+            onDone={() => dispatch({ type: "REMOVE_EFFECT", id: effect.id })}
+          />
         ))}
         {/* Bubbles sit above the sprite's head and don't rotate with it */}
         {state.sprites

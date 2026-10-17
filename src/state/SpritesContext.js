@@ -6,6 +6,8 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { spritesOverlap } from "../engine/collision";
+import { clampToStage } from "../engine/stage";
 
 // Each sprite gets a different colour tint so they're easy to tell apart.
 const SPRITE_HUES = [0, 120, 240, 60, 180, 300];
@@ -19,6 +21,8 @@ function createSprite(number, x = 0, y = 0) {
     direction: 90,
     // true = image mirrored, so the cat faces the way it's walking (see "move")
     mirrored: false,
+    // Counts Hero bumps; each change replays the wobble animation on the stage
+    bumps: 0,
     hue: SPRITE_HUES[(number - 1) % SPRITE_HUES.length],
     bubble: null,
     stacks: [],
@@ -26,20 +30,36 @@ function createSprite(number, x = 0, y = 0) {
 }
 
 let nextSpriteNumber = 2;
-const randomBetween = (min, max) => Math.round(min + Math.random() * (max - min));
+const randomBetween = (min, max) =>
+  Math.round(min + Math.random() * (max - min));
 
-// New sprites appear at a random spot on the stage, like Scratch.
-export function newSprite() {
-  return createSprite(
-    nextSpriteNumber++,
-    randomBetween(-180, 180),
-    randomBetween(-120, 120)
+// Lanes are further apart than the 80px collision box, so sprites running
+// side by side never trigger the Hero swap by accident.
+const LANE_YS = [0, -90, 90];
+const COLUMN_OFFSETS = [0, -120, 120];
+
+// New sprites line up under the first sprite (same x) in the first free lane,
+// so "Play" visibly runs them side by side. Random spot only when all are taken.
+export function newSprite(sprites) {
+  const baseX = sprites[0].x;
+  const slots = COLUMN_OFFSETS.flatMap((offset) =>
+    LANE_YS.map((y) => clampToStage(baseX + offset, y))
   );
+  const free = slots.find(
+    (slot) => !sprites.some((sprite) => spritesOverlap(slot, sprite))
+  );
+  const { x, y } = free || {
+    x: randomBetween(-180, 180),
+    y: randomBetween(-120, 120),
+  };
+  return createSprite(nextSpriteNumber++, x, y);
 }
 
 const initialState = {
   sprites: [createSprite(1)],
   selectedId: "sprite1",
+  // Short-lived "BUMP!" bursts on the stage: [{ id, x, y }]
+  effects: [],
 };
 
 function reducer(state, action) {
@@ -56,6 +76,13 @@ function reducer(state, action) {
         ...state,
         sprites: [...state.sprites, action.sprite],
         selectedId: action.sprite.id,
+      };
+    case "ADD_EFFECT":
+      return { ...state, effects: [...state.effects, action.effect] };
+    case "REMOVE_EFFECT":
+      return {
+        ...state,
+        effects: state.effects.filter(({ id }) => id !== action.id),
       };
     case "SELECT_SPRITE":
       return { ...state, selectedId: action.id };

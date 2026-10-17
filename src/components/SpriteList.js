@@ -15,7 +15,9 @@ export default function SpriteList() {
         <button
           type="button"
           title="Add sprite"
-          onClick={() => dispatch({ type: "ADD_SPRITE", sprite: newSprite() })}
+          onClick={() =>
+            dispatch({ type: "ADD_SPRITE", sprite: newSprite(state.sprites) })
+          }
           className="flex flex-row items-center px-2 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none"
         >
           <Icon name="plus" size={12} className="text-white mr-1" />
