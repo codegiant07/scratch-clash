@@ -1,7 +1,7 @@
 import React from "react";
 import { BlockList } from "./ScriptBlock";
 import { BLOCK_TYPES } from "../blocks/blockTypes";
-import { updateInputs } from "../blocks/scriptTree";
+import { removeBlock, updateInputs } from "../blocks/scriptTree";
 import { runStack } from "../engine/runScript";
 import { useDrag } from "../state/DragContext";
 import { useSprites } from "../state/SpritesContext";
@@ -19,6 +19,8 @@ export default function MidArea() {
 
   const changeInput = (blockId, name, value) =>
     setStacks(updateInputs(latestStacks(), blockId, name, value));
+  const deleteBlock = (blockId) =>
+    setStacks(removeBlock(latestStacks(), blockId));
 
   return (
     <div ref={workspaceRef} className="flex-1 h-full overflow-auto relative">
@@ -38,6 +40,7 @@ export default function MidArea() {
           <BlockList
             blocks={stack.blocks}
             onInputChange={changeInput}
+            onDelete={deleteBlock}
             // Drag moves the block and everything under it; a click runs the whole stack
             onPointerDown={(event, block) =>
               startPointer(event, {

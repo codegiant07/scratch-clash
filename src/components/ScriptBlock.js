@@ -9,10 +9,13 @@ export const ARM_WIDTH = 16;
 // One block plus, for "repeat", the blocks inside its mouth.
 // The data-* attributes are read by the drag code to find snap points.
 // `zIndex` keeps upper blocks on top so their tab covers the notch below.
+// `onDelete(blockId)` is only passed in the script area, so palette blocks
+// and the drag preview have no ✕ button.
 export default function ScriptBlock({
   block,
   onInputChange,
   onPointerDown,
+  onDelete,
   zIndex,
 }) {
   const definition = BLOCK_TYPES[block.type];
@@ -20,6 +23,7 @@ export default function ScriptBlock({
     onInputChange && ((name, value) => onInputChange(block.id, name, value));
   const handlePointerDown =
     onPointerDown && ((event) => onPointerDown(event, block));
+  const handleDelete = onDelete && (() => onDelete(block.id));
   const rootProps = {
     "data-block-id": block.id,
     onPointerDown: handlePointerDown,
@@ -31,7 +35,11 @@ export default function ScriptBlock({
   if (!definition.hasChildren) {
     return (
       <div {...rootProps}>
-        <Block block={block} onInputChange={handleInputChange} />
+        <Block
+          block={block}
+          onInputChange={handleInputChange}
+          onDelete={handleDelete}
+        />
       </div>
     );
   }
@@ -43,6 +51,7 @@ export default function ScriptBlock({
         <Block
           block={block}
           onInputChange={handleInputChange}
+          onDelete={handleDelete}
           tabLeft={ARM_WIDTH + NOTCH_LEFT}
         />
       </div>
@@ -57,6 +66,7 @@ export default function ScriptBlock({
             blocks={block.children}
             onInputChange={onInputChange}
             onPointerDown={onPointerDown}
+            onDelete={onDelete}
           />
         </div>
       </div>
@@ -72,13 +82,14 @@ export default function ScriptBlock({
   );
 }
 
-export function BlockList({ blocks, onInputChange, onPointerDown }) {
+export function BlockList({ blocks, onInputChange, onPointerDown, onDelete }) {
   return blocks.map((block, index) => (
     <ScriptBlock
       key={block.id}
       block={block}
       onInputChange={onInputChange}
       onPointerDown={onPointerDown}
+      onDelete={onDelete}
       zIndex={blocks.length - index}
     />
   ));

@@ -24,6 +24,9 @@ function createSprite(number, x = 0, y = 0) {
     // Counts Hero bumps; each change replays the wobble animation on the stage
     bumps: 0,
     hue: SPRITE_HUES[(number - 1) % SPRITE_HUES.length],
+    // Where Reset puts the sprite back: where it was added, then where it was
+    // each time Play was pressed
+    start: { x, y, direction: 90 },
     bubble: null,
     stacks: [],
   };
@@ -60,6 +63,9 @@ const initialState = {
   selectedId: "sprite1",
   // Short-lived "BUMP!" bursts on the stage: [{ id, x, y }]
   effects: [],
+  // True once Play has saved the start points; only Reset clears it, so
+  // Reset always returns to how things were before the first Play
+  startsSaved: false,
 };
 
 function reducer(state, action) {
@@ -83,6 +89,29 @@ function reducer(state, action) {
       return {
         ...state,
         effects: state.effects.filter(({ id }) => id !== action.id),
+      };
+    case "SAVE_STARTS":
+      // Already saved by an earlier Play: keep the original start points
+      if (state.startsSaved) return state;
+      return {
+        ...state,
+        startsSaved: true,
+        sprites: state.sprites.map((sprite) => ({
+          ...sprite,
+          start: { x: sprite.x, y: sprite.y, direction: sprite.direction },
+        })),
+      };
+    case "RESET_STAGE":
+      return {
+        ...state,
+        sprites: state.sprites.map((sprite) => ({
+          ...sprite,
+          ...sprite.start,
+          mirrored: false,
+          bubble: null,
+        })),
+        effects: [],
+        startsSaved: false,
       };
     case "SELECT_SPRITE":
       return { ...state, selectedId: action.id };

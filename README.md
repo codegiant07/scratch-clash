@@ -1,5 +1,8 @@
 # Scratch Clash
 
+**🔗 Live demo:** https://codegiant07.github.io/scratch-clash/
+<!-- 🎥 Video walkthrough: add the video link here -->
+
 A Scratch-style visual coding playground built with **React** and **Tailwind CSS**.
 Drag blocks into scripts, give each sprite its own script, press the green flag, and watch
 the **Hero Feature**: when two sprites collide, they swap animations.
@@ -22,9 +25,10 @@ npm run build      # production build (outputs app.js / app.css into public/)
 | **Control** | `Repeat ___` (C-shaped block; blocks inside animate one frame per pass) |
 | **Looks** | `Say ___ for ___ seconds`, `Think ___ for ___ seconds` (speech / thought bubbles) |
 | **Events** | `When 🏁 clicked`, `When this sprite clicked` |
-| **Drag and drop** | Drag from the palette, snap blocks together (Lego-style notches), drop inside `Repeat`, drag a block to take the blocks below it, drop on the palette to delete |
+| **Drag and drop** | Drag from the palette, snap blocks together (Lego-style notches), drop inside `Repeat`, drag a block to take the blocks below it |
+| **Delete** | Click the ✕ on a block to delete just that block (a `Repeat` goes with the blocks inside it), or drag blocks back onto the palette |
 | **Multiple sprites** | **+ Add sprite** (new sprites line up in lanes), each sprite has its own scripts, click a tile or a cat to select it |
-| **Play / Stop** | 🏁 starts every `When 🏁 clicked` script on all sprites at once; 🟥 stops everything |
+| **Play / Stop / Reset** | 🏁 runs every script on all sprites at once (`When this sprite clicked` scripts wait for their click); 🟥 stops everything; **Reset** puts every sprite back where it was before Play was first pressed |
 | **Hero Feature** | Sprites that collide swap animations, with a "BUMP!" burst |
 
 Extras: Scratch category rail, number-only inputs, cats face the way they walk, coloured sprites.

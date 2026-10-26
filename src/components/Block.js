@@ -8,7 +8,8 @@ const NUMBER_PATTERN = /^-?\d*\.?\d*$/;
 
 // The label row of a block, with its editable values, on a puzzle-piece shape.
 // `tabLeft` moves the bottom tab (a C-block's tab sits inside its mouth).
-export default function Block({ block, onInputChange, tabLeft }) {
+// `onDelete` adds a ✕ button (only blocks in the script area get one).
+export default function Block({ block, onInputChange, tabLeft, onDelete }) {
   const definition = BLOCK_TYPES[block.type];
 
   return (
@@ -55,6 +56,17 @@ export default function Block({ block, onInputChange, tabLeft }) {
             />
           );
         })}
+        {onDelete && (
+          <button
+            type="button"
+            title="Delete block"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={onDelete}
+            className="ml-2 w-4 h-4 flex items-center justify-center rounded-full bg-black bg-opacity-20 hover:bg-opacity-40 focus:outline-none"
+          >
+            <Icon name="times" size={8} className="text-white" />
+          </button>
+        )}
       </div>
     </BlockBody>
   );

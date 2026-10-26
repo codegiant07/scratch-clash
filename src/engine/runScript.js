@@ -210,8 +210,28 @@ export function startHatScripts(hatType, engine, spriteIds) {
     );
 }
 
-// Green flag: restart all flag scripts, like Scratch.
+// Green flag: restart every script on every sprite, with or without a
+// "When 🏁 clicked" block on top. Only "When this sprite clicked" scripts
+// wait for their click. Start positions are saved first, for Reset
+// (only on the first Play since the last Reset).
 export function playAll(engine) {
   stopAll(engine);
-  startHatScripts("whenFlagClicked", engine);
+  engine.dispatch({ type: "SAVE_STARTS" });
+  engine
+    .getState()
+    .sprites.forEach((sprite) =>
+      sprite.stacks
+        .filter(({ blocks }) => blocks[0].type !== "whenSpriteClicked")
+        .forEach(({ id, blocks }) => runStack(blocks, sprite.id, engine, id))
+    );
+}
+
+// Reset: stop everything and put every sprite back where it was before the
+// first Play since the last Reset (or where it was added). Like "Go to", this
+// is a jump, so overlaps it creates are only noted, never counted as a bump.
+export function resetStage(engine) {
+  stopAll(engine);
+  engine.dispatch({ type: "RESET_STAGE" });
+  const { sprites } = engine.getState();
+  sprites.forEach(({ id }) => findNewCollisions(id, sprites));
 }

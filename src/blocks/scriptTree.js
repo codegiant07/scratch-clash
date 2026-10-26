@@ -101,6 +101,19 @@ export function insertChain(stacks, target, chain) {
   }
 }
 
+// Deletes one block (a repeat goes with the blocks inside it); the blocks
+// below it move up to close the gap. A stack left empty is removed.
+export function removeBlock(stacks, blockId) {
+  const remove = (list) =>
+    mapChildren(
+      list.filter(({ id }) => id !== blockId),
+      remove
+    );
+  return stacks
+    .map((stack) => ({ ...stack, blocks: remove(stack.blocks) }))
+    .filter(({ blocks }) => blocks.length);
+}
+
 export function collectIds(blocks, ids = new Set()) {
   blocks.forEach((block) => {
     ids.add(block.id);

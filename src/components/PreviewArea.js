@@ -4,7 +4,12 @@ import BumpEffect from "./BumpEffect";
 import Icon from "./Icon";
 import SpeechBubble from "./SpeechBubble";
 import SpriteList from "./SpriteList";
-import { playAll, startHatScripts, stopAll } from "../engine/runScript";
+import {
+  playAll,
+  resetStage,
+  startHatScripts,
+  stopAll,
+} from "../engine/runScript";
 import {
   SPRITE_HEIGHT,
   SPRITE_WIDTH,
@@ -38,6 +43,15 @@ export default function PreviewArea() {
           className="p-1 rounded hover:bg-gray-100 focus:outline-none"
         >
           <Icon name="stop" size={20} className="text-red-600" />
+        </button>
+        <button
+          type="button"
+          title="Reset"
+          onClick={() => resetStage(engine)}
+          className="flex flex-row items-center ml-2 px-2 py-1 text-sm text-gray-700 rounded border border-gray-300 hover:bg-gray-100 focus:outline-none"
+        >
+          <Icon name="undo-alt" size={12} className="text-gray-700 mr-1" />
+          {"Reset"}
         </button>
       </div>
       {/* Stage keeps Scratch's 4:3 shape at any panel width */}
